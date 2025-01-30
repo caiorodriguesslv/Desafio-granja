@@ -1,1 +1,19 @@
-spring.application.name=granja
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/granja_patos_db
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver # Adicione o driver do PostgreSQL
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  profiles:
+    active: dev
+
+server:
+  port: 8080
+
