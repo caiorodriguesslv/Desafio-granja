@@ -1,25 +1,26 @@
 package com.devilish.granja.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tb_duck")
+@Table(name = "tb_client")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@NoArgsConstructor
 @Builder
-public class Duck {
+public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "mae_id")
-    private Duck mae;
+    private boolean discountEligible;
 
 
 }

@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1/patos")
+@RequestMapping("/v1/ducks")
 @Validated
 public class DuckController {
 
