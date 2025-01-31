@@ -119,6 +119,7 @@ public class SaleServiceImpl implements SaleService {
     public SaleResponseDTO update(Long id, SaleRequestDTO saleRequestDTO) {
         log.info("Atualizando venda com ID: {}", id);
 
+
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Venda não encontrada com o ID: {}", id);
@@ -151,9 +152,9 @@ public class SaleServiceImpl implements SaleService {
 
 
         ducks.forEach(duck -> {
-            if (duck.isSold()) {
-                log.error("Pato já vendido: ID={}, Nome={}", duck.getId(), duck.getName());
-                throw new RuntimeException("Pato já vendido: " + duck.getId());
+            if (duck.isSold() && !sale.getDucks().contains(duck)) {
+                log.error("Pato já vendido em outra venda: ID={}, Nome={}", duck.getId(), duck.getName());
+                throw new RuntimeException("Pato já vendido em outra venda: " + duck.getId());
             }
         });
 

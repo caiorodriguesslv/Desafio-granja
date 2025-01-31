@@ -69,13 +69,17 @@ public class SellerServiceImpl implements SellerService {
 
     @Override
     public SellerResponseDTO update(Long id, SellerRequestDTO sellerRequestDTO) {
-        log.info("Atualizando vendedor com ID: {}", id);
+        log.info("Iniciando atualização do vendedor com ID: {}", id);
+
 
         Seller seller = sellerRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", id);
                     return new RuntimeException("Vendedor não encontrado: " + id);
                 });
+
+        log.info("Vendedor encontrado: ID={}, Nome={}, CPF={}, Matrícula={}",
+                seller.getId(), seller.getName(), seller.getCpf(), seller.getRegistration());
 
 
         if (!CpfValidator.isValid(sellerRequestDTO.getCpf())) {
@@ -110,10 +114,12 @@ public class SellerServiceImpl implements SellerService {
         seller.setCpf(sellerRequestDTO.getCpf());
         seller.setRegistration(sellerRequestDTO.getRegistration());
 
+
         Seller updatedSeller = sellerRepository.save(seller);
 
         log.info("Vendedor atualizado com sucesso: ID={}, Nome={}, CPF={}, Matrícula={}",
                 updatedSeller.getId(), updatedSeller.getName(), updatedSeller.getCpf(), updatedSeller.getRegistration());
+
 
         return SellerResponseDTO.builder()
                 .id(updatedSeller.getId())
