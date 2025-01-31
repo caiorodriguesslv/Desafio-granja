@@ -26,6 +26,7 @@ public class DuckServiceImpl implements DuckService {
     public DuckResponseDTO save(DuckRequestDTO duckRequestDTO) {
         log.info("Iniciando método save");
 
+
         if (duckRequestDTO.getName() == null || duckRequestDTO.getName().trim().isEmpty()) {
             throw new RuntimeException("O nome do pato não pode estar vazio!");
         }
@@ -35,18 +36,12 @@ public class DuckServiceImpl implements DuckService {
             throw new RuntimeException("O ID da mãe não pode ser nulo!");
         }
 
-        log.info("Buscando mãe com ID: {}", duckRequestDTO.getMaeId());
-
-
-        Duck mae = duckRepository.findById(duckRequestDTO.getMaeId())
-                .orElseThrow(() -> new RuntimeException("Mãe não encontrada com o ID: " + duckRequestDTO.getMaeId()));
-
-        log.info("Mãe encontrada: {}", mae);
+        log.info("Salvando pato com mãe de ID: {}", duckRequestDTO.getMaeId());
 
 
         Duck duck = Duck.builder()
                 .name(duckRequestDTO.getName())
-                .mae(mae)
+                .mae(Duck.builder().id(duckRequestDTO.getMaeId()).build())
                 .build();
 
 
