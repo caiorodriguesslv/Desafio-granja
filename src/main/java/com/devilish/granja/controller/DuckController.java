@@ -27,6 +27,7 @@ public class DuckController {
         DuckResponseDTO duckResponseDTO = duckService.save(duckRequestDTO);
         return ResponseEntity.ok(duckResponseDTO);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<DuckResponseDTO> findDuckById(@PathVariable Long id) {
         DuckResponseDTO duck = duckService.findById(id);

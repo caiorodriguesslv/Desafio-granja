@@ -2,6 +2,7 @@ package com.devilish.granja.controller;
 
 import com.devilish.granja.dto.request.SaleRequestDTO;
 import com.devilish.granja.dto.response.SaleResponseDTO;
+import com.devilish.granja.dto.response.SoldDuckResponseDTO;
 import com.devilish.granja.services.SaleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,10 @@ public class SaleController {
         return new ResponseEntity<>(saleResponseDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/sold/ducks")
+    public List<SoldDuckResponseDTO> findAllSoldDucks() {
+        return saleService.findAllSoldDucks();
+    }
 
     @GetMapping
     public ResponseEntity<List<SaleResponseDTO>> getAllSales() {

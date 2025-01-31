@@ -2,6 +2,7 @@ package com.devilish.granja.services;
 
 import com.devilish.granja.dto.request.DuckRequestDTO;
 import com.devilish.granja.dto.response.DuckResponseDTO;
+import com.devilish.granja.entities.Duck;
 
 import java.util.List;
 

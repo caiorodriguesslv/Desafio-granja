@@ -10,5 +10,4 @@ public interface SellerService {
     SellerResponseDTO findById(Long id);
     List<SellerResponseDTO> findAll();
     SellerResponseDTO update(Long id, SellerRequestDTO sellerRequestDTO);
-    void delete(Long id);
 }

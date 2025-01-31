@@ -13,12 +13,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DuckServiceImpl implements DuckService {
-
 
     private final DuckRepository duckRepository;
 
@@ -26,14 +24,16 @@ public class DuckServiceImpl implements DuckService {
     public DuckResponseDTO save(DuckRequestDTO duckRequestDTO) {
         log.info("Iniciando método save");
 
-
         if (duckRequestDTO.getName() == null || duckRequestDTO.getName().trim().isEmpty()) {
             throw new RuntimeException("O nome do pato não pode estar vazio!");
         }
 
-
         if (duckRequestDTO.getMaeId() == null) {
             throw new RuntimeException("O ID da mãe não pode ser nulo!");
+        }
+
+        if (duckRequestDTO.getPrice() <= 0) {
+            throw new RuntimeException("O preço do pato deve ser maior que zero!");
         }
 
         log.info("Salvando pato com mãe de ID: {}", duckRequestDTO.getMaeId());
@@ -42,6 +42,8 @@ public class DuckServiceImpl implements DuckService {
         Duck duck = Duck.builder()
                 .name(duckRequestDTO.getName())
                 .mae(Duck.builder().id(duckRequestDTO.getMaeId()).build())
+                .price(duckRequestDTO.getPrice())
+                .sold(duckRequestDTO.isSold())
                 .build();
 
 
@@ -54,6 +56,8 @@ public class DuckServiceImpl implements DuckService {
                 .id(savedDuck.getId())
                 .name(savedDuck.getName())
                 .maeId(savedDuck.getMae() != null ? savedDuck.getMae().getId() : null)
+                .price(savedDuck.getPrice())
+                .sold(savedDuck.isSold())
                 .build();
     }
 
@@ -69,6 +73,8 @@ public class DuckServiceImpl implements DuckService {
                 .id(duck.getId())
                 .name(duck.getName())
                 .maeId(duck.getMae() != null ? duck.getMae().getId() : null)
+                .price(duck.getPrice())
+                .sold(duck.isSold())
                 .build();
     }
 
@@ -83,6 +89,8 @@ public class DuckServiceImpl implements DuckService {
                         .id(duck.getId())
                         .name(duck.getName())
                         .maeId(duck.getMae() != null ? duck.getMae().getId() : null)
+                        .price(duck.getPrice())
+                        .sold(duck.isSold())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -90,18 +98,30 @@ public class DuckServiceImpl implements DuckService {
     @Override
     public DuckResponseDTO update(Long id, DuckRequestDTO duckRequestDTO) {
         log.info("Atualizando pato com ID: {}", id);
+
+
         Duck duck = duckRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pato não encontrado com o ID: " + id));
+
 
         if (duckRequestDTO.getMaeId() == null) {
             throw new InvalidMaeException("O ID da mãe não pode ser nulo!");
         }
 
+        if (duckRequestDTO.getPrice() <= 0) {
+            throw new RuntimeException("O preço do pato deve ser maior que zero!");
+        }
+
+
         Duck mae = duckRepository.findById(duckRequestDTO.getMaeId())
                 .orElseThrow(() -> new InvalidMaeException("Mãe não encontrada com o ID: " + duckRequestDTO.getMaeId()));
 
+
         duck.setName(duckRequestDTO.getName());
         duck.setMae(mae);
+        duck.setPrice(duckRequestDTO.getPrice());
+        duck.setSold(duckRequestDTO.isSold());
+
 
         Duck updatedDuck = duckRepository.save(duck);
 
@@ -112,6 +132,8 @@ public class DuckServiceImpl implements DuckService {
                 .id(updatedDuck.getId())
                 .name(updatedDuck.getName())
                 .maeId(updatedDuck.getMae() != null ? updatedDuck.getMae().getId() : null)
+                .price(updatedDuck.getPrice())
+                .sold(updatedDuck.isSold())
                 .build();
     }
 
@@ -127,5 +149,3 @@ public class DuckServiceImpl implements DuckService {
         log.info("Pato excluído com sucesso: {}", duck);
     }
 }
-
-

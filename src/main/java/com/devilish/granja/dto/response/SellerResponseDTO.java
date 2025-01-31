@@ -13,11 +13,8 @@ import lombok.NoArgsConstructor;
 public class SellerResponseDTO {
 
     private Long id;
-    @NotNull(message = "O cpf deve ter 11 digitos!")
     private String cpf;
-    @NotNull(message = "O nome não pode estar vázio!")
     private String name;
-    @NotNull(message = "A matricula não pode estar vazia!")
     private String registration;
 
 }

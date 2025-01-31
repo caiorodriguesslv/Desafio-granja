@@ -21,5 +21,8 @@ public class Duck {
     @JoinColumn(name = "mae_id")
     private Duck mae;
 
+    private boolean sold;
+
+    private double price;
 
 }

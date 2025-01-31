@@ -45,11 +45,4 @@ public class SellerController {
         SellerResponseDTO updatedSeller = sellerService.update(id, sellerRequestDTO);
         return new ResponseEntity<>(updatedSeller, HttpStatus.OK);
     }
-
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSeller(@PathVariable Long id) {
-        sellerService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 }
