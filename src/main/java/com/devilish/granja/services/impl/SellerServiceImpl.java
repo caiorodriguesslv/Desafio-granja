@@ -5,6 +5,7 @@ import com.devilish.granja.dto.response.SellerResponseDTO;
 import com.devilish.granja.entities.Seller;
 import com.devilish.granja.repository.SellerRepository;
 import com.devilish.granja.services.SellerService;
+import com.devilish.granja.utils.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,27 +25,21 @@ public class SellerServiceImpl implements SellerService {
         log.info("Iniciando método save para o vendedor: {}", sellerRequestDTO.getName());
 
 
-        if (!CpfValidator.isValid(sellerRequestDTO.getCpf())) {
-            log.error("CPF inválido: {}", sellerRequestDTO.getCpf());
-            throw new RuntimeException("CPF inválido.");
-        }
-
-
-        if (!MatriculaValidator.isValid(sellerRequestDTO.getRegistration())) {
-            log.error("Matrícula inválida: {}", sellerRequestDTO.getRegistration());
-            throw new RuntimeException("Matrícula inválida.");
+        if (!sellerRequestDTO.isValidCpfAndRegistration()) {
+            log.error("Dados inválidos fornecidos para o vendedor: {}", sellerRequestDTO.getName());
+            throw new RuntimeException("Dados inválidos. Verifique as informações fornecidas.");
         }
 
 
         sellerRepository.findByCpf(sellerRequestDTO.getCpf()).ifPresent(seller -> {
-            log.error("Já existe um vendedor com o CPF: {}", sellerRequestDTO.getCpf());
-            throw new RuntimeException("Já existe um vendedor com o CPF informado.");
+            log.error("Tentativa de cadastro com CPF já existente: {}", sellerRequestDTO.getCpf());
+            throw new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
         });
 
 
         sellerRepository.findByRegistration(sellerRequestDTO.getRegistration()).ifPresent(seller -> {
-            log.error("Já existe um vendedor com a matrícula: {}", sellerRequestDTO.getRegistration());
-            throw new RuntimeException("Já existe um vendedor com a matrícula informada.");
+            log.error("Tentativa de cadastro com matrícula já existente: {}", sellerRequestDTO.getRegistration());
+            throw new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
         });
 
 
@@ -54,10 +49,10 @@ public class SellerServiceImpl implements SellerService {
                 .registration(sellerRequestDTO.getRegistration())
                 .build();
 
+
         Seller savedSeller = sellerRepository.save(seller);
 
-        log.info("Vendedor salvo com sucesso: ID={}, Nome={}, CPF={}, Matrícula={}",
-                savedSeller.getId(), savedSeller.getName(), savedSeller.getCpf(), savedSeller.getRegistration());
+        log.info("Vendedor salvo com sucesso: ID={}, Nome={}", savedSeller.getId(), savedSeller.getName());
 
         return SellerResponseDTO.builder()
                 .id(savedSeller.getId())
@@ -75,37 +70,36 @@ public class SellerServiceImpl implements SellerService {
         Seller seller = sellerRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", id);
-                    return new RuntimeException("Vendedor não encontrado: " + id);
+                    return new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
                 });
 
-        log.info("Vendedor encontrado: ID={}, Nome={}, CPF={}, Matrícula={}",
-                seller.getId(), seller.getName(), seller.getCpf(), seller.getRegistration());
+        log.info("Vendedor encontrado: ID={}, Nome={}", seller.getId(), seller.getName());
 
 
-        if (!CpfValidator.isValid(sellerRequestDTO.getCpf())) {
-            log.error("CPF inválido: {}", sellerRequestDTO.getCpf());
-            throw new RuntimeException("CPF inválido.");
+        if (!Validator.isValidCpf(sellerRequestDTO.getCpf())) {
+            log.error("CPF inválido fornecido para atualização: {}", sellerRequestDTO.getCpf());
+            throw new RuntimeException("Dados inválidos. Verifique as informações fornecidas.");
         }
 
 
-        if (!MatriculaValidator.isValid(sellerRequestDTO.getRegistration())) {
-            log.error("Matrícula inválida: {}", sellerRequestDTO.getRegistration());
-            throw new RuntimeException("Matrícula inválida.");
+        if (!Validator.isValidRegistration(sellerRequestDTO.getRegistration())) {
+            log.error("Matrícula inválida fornecida para atualização: {}", sellerRequestDTO.getRegistration());
+            throw new RuntimeException("Dados inválidos. Verifique as informações fornecidas.");
         }
 
 
         if (!seller.getCpf().equals(sellerRequestDTO.getCpf())) {
             sellerRepository.findByCpf(sellerRequestDTO.getCpf()).ifPresent(existingSeller -> {
-                log.error("Já existe um vendedor com o CPF: {}", sellerRequestDTO.getCpf());
-                throw new RuntimeException("Já existe um vendedor com o CPF informado.");
+                log.error("Tentativa de atualização com CPF já existente: {}", sellerRequestDTO.getCpf());
+                throw new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
             });
         }
 
 
         if (!seller.getRegistration().equals(sellerRequestDTO.getRegistration())) {
             sellerRepository.findByRegistration(sellerRequestDTO.getRegistration()).ifPresent(existingSeller -> {
-                log.error("Já existe um vendedor com a matrícula: {}", sellerRequestDTO.getRegistration());
-                throw new RuntimeException("Já existe um vendedor com a matrícula informada.");
+                log.error("Tentativa de atualização com matrícula já existente: {}", sellerRequestDTO.getRegistration());
+                throw new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
             });
         }
 
@@ -117,9 +111,7 @@ public class SellerServiceImpl implements SellerService {
 
         Seller updatedSeller = sellerRepository.save(seller);
 
-        log.info("Vendedor atualizado com sucesso: ID={}, Nome={}, CPF={}, Matrícula={}",
-                updatedSeller.getId(), updatedSeller.getName(), updatedSeller.getCpf(), updatedSeller.getRegistration());
-
+        log.info("Vendedor atualizado com sucesso: ID={}, Nome={}", updatedSeller.getId(), updatedSeller.getName());
 
         return SellerResponseDTO.builder()
                 .id(updatedSeller.getId())
@@ -133,14 +125,14 @@ public class SellerServiceImpl implements SellerService {
     public SellerResponseDTO findById(Long id) {
         log.info("Buscando vendedor com ID: {}", id);
 
+        // Busca o vendedor
         Seller seller = sellerRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", id);
-                    return new RuntimeException("Vendedor não encontrado: " + id);
+                    return new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
                 });
 
-        log.info("Vendedor encontrado: ID={}, Nome={}, CPF={}, Matrícula={}",
-                seller.getId(), seller.getName(), seller.getCpf(), seller.getRegistration());
+        log.info("Vendedor encontrado: ID={}, Nome={}", seller.getId(), seller.getName());
 
         return SellerResponseDTO.builder()
                 .id(seller.getId())
@@ -154,14 +146,14 @@ public class SellerServiceImpl implements SellerService {
     public List<SellerResponseDTO> findAll() {
         log.info("Listando todos os vendedores");
 
+        // Busca todos os vendedores
         List<Seller> sellers = sellerRepository.findAll();
 
         log.info("Total de vendedores encontrados: {}", sellers.size());
 
         return sellers.stream()
                 .map(seller -> {
-                    log.debug("Convertendo vendedor para DTO: ID={}, Nome={}, CPF={}, Matrícula={}",
-                            seller.getId(), seller.getName(), seller.getCpf(), seller.getRegistration());
+                    log.debug("Convertendo vendedor para DTO: ID={}, Nome={}", seller.getId(), seller.getName());
                     return SellerResponseDTO.builder()
                             .id(seller.getId())
                             .name(seller.getName())
@@ -170,76 +162,5 @@ public class SellerServiceImpl implements SellerService {
                             .build();
                 })
                 .collect(Collectors.toList());
-    }
-
-
-    private static class CpfValidator {
-        public static boolean isValid(String cpf) {
-            // Remove caracteres não numéricos
-            cpf = cpf.replaceAll("[^0-9]", "");
-
-            // Verifica se o CPF tem 11 dígitos
-            if (cpf.length() != 11) {
-                return false;
-            }
-
-            // Verifica se todos os dígitos são iguais (CPF inválido)
-            if (cpf.matches("(\\d)\\1{10}")) {
-                return false;
-            }
-
-            // Calcula o primeiro dígito verificador
-            int sum = 0;
-            for (int i = 0; i < 9; i++) {
-                sum += Integer.parseInt(cpf.substring(i, i + 1)) * (10 - i);
-            }
-            int remainder = sum % 11;
-            int digit1 = (remainder < 2) ? 0 : 11 - remainder;
-
-            // Calcula o segundo dígito verificador
-            sum = 0;
-            for (int i = 0; i < 10; i++) {
-                sum += Integer.parseInt(cpf.substring(i, i + 1)) * (11 - i);
-            }
-            remainder = sum % 11;
-            int digit2 = (remainder < 2) ? 0 : 11 - remainder;
-
-            // Verifica se os dígitos calculados são iguais aos dígitos do CPF
-            return cpf.substring(9).equals(String.valueOf(digit1) + String.valueOf(digit2));
-        }
-
-        private static int calculateDigit(String str, int[] weights) {
-            int sum = 0;
-            for (int i = 0; i < str.length(); i++) {
-                sum += Integer.parseInt(str.substring(i, i + 1)) * weights[i];
-            }
-            int remainder = sum % 11;
-            return remainder < 2 ? 0 : 11 - remainder;
-        }
-    }
-
-
-    private static class MatriculaValidator {
-        public static boolean isValid(String matricula) {
-
-            matricula = matricula.replaceAll("[^0-9]", "");
-
-
-            if (matricula.length() != 6) {
-                return false;
-            }
-
-
-            if (matricula.matches("0{6}")) {
-                return false;
-            }
-
-
-            if (!matricula.matches("[1-9]\\d{5}")) {
-                return false;
-            }
-
-            return true;
-        }
     }
 }

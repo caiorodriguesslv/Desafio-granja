@@ -25,19 +25,18 @@ public class DuckServiceImpl implements DuckService {
         log.info("Iniciando método save");
 
         if (duckRequestDTO.getName() == null || duckRequestDTO.getName().trim().isEmpty()) {
-            throw new RuntimeException("O nome do pato não pode estar vazio!");
+            throw new RuntimeException("Verifique os dados fornecidos.");
         }
 
         if (duckRequestDTO.getMaeId() == null) {
-            throw new RuntimeException("O ID da mãe não pode ser nulo!");
+            throw new RuntimeException("Verifique os dados fornecidos.");
         }
 
         if (duckRequestDTO.getPrice() <= 0) {
-            throw new RuntimeException("O preço do pato deve ser maior que zero!");
+            throw new RuntimeException("Verifique os dados fornecidos.");
         }
 
         log.info("Salvando pato com mãe de ID: {}", duckRequestDTO.getMaeId());
-
 
         Duck duck = Duck.builder()
                 .name(duckRequestDTO.getName())
@@ -46,11 +45,9 @@ public class DuckServiceImpl implements DuckService {
                 .sold(duckRequestDTO.isSold())
                 .build();
 
-
         Duck savedDuck = duckRepository.save(duck);
 
-        log.info("Pato salvo com sucesso: {}", savedDuck);
-
+        log.info("Pato salvo com sucesso.");
 
         return DuckResponseDTO.builder()
                 .id(savedDuck.getId())
@@ -61,13 +58,12 @@ public class DuckServiceImpl implements DuckService {
                 .build();
     }
 
-
     @Override
     public DuckResponseDTO findById(Long id) {
         log.info("Buscando pato com ID: {}", id);
 
         Duck duck = duckRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pato não encontrado com o ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Operação não permitida."));
 
         return DuckResponseDTO.builder()
                 .id(duck.getId())
@@ -80,7 +76,7 @@ public class DuckServiceImpl implements DuckService {
 
     @Override
     public List<DuckResponseDTO> findAll() {
-        log.info("Listando todos os patos");
+        log.info("Listando todos os patos.");
 
         List<Duck> ducks = duckRepository.findAll();
 
@@ -99,34 +95,28 @@ public class DuckServiceImpl implements DuckService {
     public DuckResponseDTO update(Long id, DuckRequestDTO duckRequestDTO) {
         log.info("Atualizando pato com ID: {}", id);
 
-
         Duck duck = duckRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pato não encontrado com o ID: " + id));
-
+                .orElseThrow(() -> new RuntimeException("Operação não permitida."));
 
         if (duckRequestDTO.getMaeId() == null) {
-            throw new InvalidMaeException("O ID da mãe não pode ser nulo!");
+            throw new InvalidMaeException("Verifique os dados fornecidos.");
         }
 
         if (duckRequestDTO.getPrice() <= 0) {
-            throw new RuntimeException("O preço do pato deve ser maior que zero!");
+            throw new RuntimeException("Verifique os dados fornecidos.");
         }
 
-
         Duck mae = duckRepository.findById(duckRequestDTO.getMaeId())
-                .orElseThrow(() -> new InvalidMaeException("Mãe não encontrada com o ID: " + duckRequestDTO.getMaeId()));
-
+                .orElseThrow(() -> new InvalidMaeException("Operação não permitida."));
 
         duck.setName(duckRequestDTO.getName());
         duck.setMae(mae);
         duck.setPrice(duckRequestDTO.getPrice());
         duck.setSold(duckRequestDTO.isSold());
 
-
         Duck updatedDuck = duckRepository.save(duck);
 
-        log.info("Pato atualizado com sucesso: {}", updatedDuck);
-
+        log.info("Pato atualizado com sucesso.");
 
         return DuckResponseDTO.builder()
                 .id(updatedDuck.getId())
@@ -142,10 +132,10 @@ public class DuckServiceImpl implements DuckService {
         log.info("Excluindo pato com ID: {}", id);
 
         Duck duck = duckRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pato não encontrado com o ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Operação não permitida."));
 
         duckRepository.delete(duck);
 
-        log.info("Pato excluído com sucesso: {}", duck);
+        log.info("Pato excluído com sucesso.");
     }
 }

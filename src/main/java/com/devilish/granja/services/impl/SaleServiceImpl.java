@@ -28,42 +28,36 @@ public class SaleServiceImpl implements SaleService {
     public SaleResponseDTO save(SaleRequestDTO saleRequestDTO) {
         log.info("Iniciando método save para a venda");
 
-
         Client client = clientRepository.findById(saleRequestDTO.getClientId())
                 .orElseThrow(() -> {
                     log.error("Cliente não encontrado com o ID: {}", saleRequestDTO.getClientId());
-                    return new RuntimeException("Cliente não encontrado: " + saleRequestDTO.getClientId());
+                    return new RuntimeException("Operação não permitida.");
                 });
-
 
         Seller seller = sellerRepository.findById(saleRequestDTO.getSellerId())
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", saleRequestDTO.getSellerId());
-                    return new RuntimeException("Vendedor não encontrado: " + saleRequestDTO.getSellerId());
+                    return new RuntimeException("Operação não permitida.");
                 });
-
 
         List<Duck> ducks = duckRepository.findAllById(saleRequestDTO.getDuckIds());
         if (ducks.isEmpty()) {
             log.error("Nenhum pato encontrado com os IDs fornecidos: {}", saleRequestDTO.getDuckIds());
-            throw new RuntimeException("Nenhum pato encontrado com os IDs fornecidos");
+            throw new RuntimeException("Verifique os dados fornecidos.");
         }
-
 
         ducks.forEach(duck -> {
             if (duck.isSold()) {
                 log.error("Pato já vendido: ID={}, Nome={}", duck.getId(), duck.getName());
-                throw new RuntimeException("Pato já vendido: " + duck.getId());
+                throw new RuntimeException("Operação não permitida.");
             }
         });
-
 
         double totalValue = ducks.stream().mapToDouble(Duck::getPrice).sum();
         if (client.isDiscountEligible()) {
             totalValue *= 0.8;
             log.info("Desconto de 20% aplicado para o cliente: ID={}, Nome={}", client.getId(), client.getName());
         }
-
 
         Sale sale = Sale.builder()
                 .dateSale(LocalDateTime.now())
@@ -73,10 +67,8 @@ public class SaleServiceImpl implements SaleService {
                 .totalValue(totalValue)
                 .build();
 
-
         ducks.forEach(duck -> duck.setSold(true));
         duckRepository.saveAll(ducks);
-
 
         Sale savedSale = saleRepository.save(sale);
 
@@ -93,7 +85,7 @@ public class SaleServiceImpl implements SaleService {
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Venda não encontrada com o ID: {}", id);
-                    return new RuntimeException("Venda não encontrada: " + id);
+                    return new RuntimeException("Operação não permitida.");
                 });
 
         log.info("Venda encontrada: ID={}, Data={}, Cliente ID={}, Vendedor ID={}, Valor Total={}",
@@ -119,54 +111,45 @@ public class SaleServiceImpl implements SaleService {
     public SaleResponseDTO update(Long id, SaleRequestDTO saleRequestDTO) {
         log.info("Atualizando venda com ID: {}", id);
 
-
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Venda não encontrada com o ID: {}", id);
-                    return new RuntimeException("Venda não encontrada: " + id);
+                    return new RuntimeException("Operação não permitida.");
                 });
 
         log.info("Venda encontrada para atualização: ID={}, Data={}, Cliente ID={}, Vendedor ID={}, Valor Total={}",
                 sale.getId(), sale.getDateSale(), sale.getClient().getId(), sale.getSeller().getId(), sale.getTotalValue());
 
-
         Client client = clientRepository.findById(saleRequestDTO.getClientId())
                 .orElseThrow(() -> {
                     log.error("Cliente não encontrado com o ID: {}", saleRequestDTO.getClientId());
-                    return new RuntimeException("Cliente não encontrado: " + saleRequestDTO.getClientId());
+                    return new RuntimeException("Operação não permitida.");
                 });
-
 
         Seller seller = sellerRepository.findById(saleRequestDTO.getSellerId())
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", saleRequestDTO.getSellerId());
-                    return new RuntimeException("Vendedor não encontrado: " + saleRequestDTO.getSellerId());
+                    return new RuntimeException("Operação não permitida.");
                 });
-
 
         List<Duck> ducks = duckRepository.findAllById(saleRequestDTO.getDuckIds());
         if (ducks.isEmpty()) {
             log.error("Nenhum pato encontrado com os IDs fornecidos: {}", saleRequestDTO.getDuckIds());
-            throw new RuntimeException("Nenhum pato encontrado com os IDs fornecidos");
+            throw new RuntimeException("Verifique os dados fornecidos.");
         }
-
 
         ducks.forEach(duck -> {
             if (duck.isSold() && !sale.getDucks().contains(duck)) {
                 log.error("Pato já vendido em outra venda: ID={}, Nome={}", duck.getId(), duck.getName());
-                throw new RuntimeException("Pato já vendido em outra venda: " + duck.getId());
+                throw new RuntimeException("Operação não permitida.");
             }
         });
 
-
         double totalValue = ducks.stream().mapToDouble(Duck::getPrice).sum();
-
-
         if (client.isDiscountEligible()) {
             totalValue *= 0.8;
             log.info("Desconto de 20% aplicado para o cliente: ID={}, Nome={}", client.getId(), client.getName());
         }
-
 
         sale.setDateSale(LocalDateTime.now());
         sale.setClient(client);
@@ -174,10 +157,8 @@ public class SaleServiceImpl implements SaleService {
         sale.setDucks(ducks);
         sale.setTotalValue(totalValue);
 
-
         ducks.forEach(duck -> duck.setSold(true));
         duckRepository.saveAll(ducks);
-
 
         Sale updatedSale = saleRepository.save(sale);
 
@@ -194,7 +175,7 @@ public class SaleServiceImpl implements SaleService {
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Venda não encontrada com o ID: {}", id);
-                    return new RuntimeException("Venda não encontrada com o ID: " + id);
+                    return new RuntimeException("Operação não permitida.");
                 });
 
         log.info("Venda encontrada para exclusão: ID={}, Data={}, Cliente ID={}, Vendedor ID={}, Valor Total={}",
@@ -223,14 +204,11 @@ public class SaleServiceImpl implements SaleService {
     public List<SoldDuckResponseDTO> findAllSoldDucks() {
         log.info("Listando todas as vendas de patos");
 
-
         List<Sale> sales = saleRepository.findAll();
-
 
         return sales.stream()
                 .filter(sale -> sale.getDucks().stream().anyMatch(Duck::isSold))
                 .map(sale -> {
-
                     List<SoldDuckResponseDTO.DuckInfoDTO> soldDucks = sale.getDucks().stream()
                             .filter(Duck::isSold)
                             .map(duck -> SoldDuckResponseDTO.DuckInfoDTO.builder()
@@ -238,7 +216,6 @@ public class SaleServiceImpl implements SaleService {
                                     .price(duck.getPrice())
                                     .build())
                             .collect(Collectors.toList());
-
 
                     return SoldDuckResponseDTO.builder()
                             .ducks(soldDucks)
@@ -250,5 +227,4 @@ public class SaleServiceImpl implements SaleService {
                 })
                 .collect(Collectors.toList());
     }
-
 }
