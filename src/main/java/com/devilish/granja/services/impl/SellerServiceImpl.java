@@ -1,8 +1,11 @@
 package com.devilish.granja.services.impl;
 
 import com.devilish.granja.dto.request.SellerRequestDTO;
+import com.devilish.granja.dto.response.SellerRankingResponseDTO;
 import com.devilish.granja.dto.response.SellerResponseDTO;
+import com.devilish.granja.entities.Duck;
 import com.devilish.granja.entities.Seller;
+import com.devilish.granja.repository.SaleRepository;
 import com.devilish.granja.repository.SellerRepository;
 import com.devilish.granja.services.SellerService;
 import com.devilish.granja.utils.Validator;
@@ -10,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +23,7 @@ import java.util.stream.Collectors;
 public class SellerServiceImpl implements SellerService {
 
     private final SellerRepository sellerRepository;
+    private final SaleRepository saleRepository;
 
     @Override
     public SellerResponseDTO save(SellerRequestDTO sellerRequestDTO) {
@@ -125,7 +130,7 @@ public class SellerServiceImpl implements SellerService {
     public SellerResponseDTO findById(Long id) {
         log.info("Buscando vendedor com ID: {}", id);
 
-        // Busca o vendedor
+
         Seller seller = sellerRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", id);
@@ -146,7 +151,7 @@ public class SellerServiceImpl implements SellerService {
     public List<SellerResponseDTO> findAll() {
         log.info("Listando todos os vendedores");
 
-        // Busca todos os vendedores
+
         List<Seller> sellers = sellerRepository.findAll();
 
         log.info("Total de vendedores encontrados: {}", sellers.size());
@@ -161,6 +166,32 @@ public class SellerServiceImpl implements SellerService {
                             .registration(seller.getRegistration())
                             .build();
                 })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SellerRankingResponseDTO> getTopSellersBySalesCount(LocalDateTime startDate, LocalDateTime endDate, Boolean sold) {
+        log.info("Calculando ranking de vendedores por número de vendas");
+
+
+        List<Seller> sellers = sellerRepository.findAll();
+
+        return sellers.stream()
+                .map(seller -> {
+                    int totalSales = saleRepository.findBySeller(seller).stream()
+                            .filter(sale -> (startDate == null || sale.getDateSale().isAfter(startDate))
+                                    && (endDate == null || sale.getDateSale().isBefore(endDate))
+                                    && (sold == null || sold == sale.getDucks().stream().anyMatch(Duck::isSold)))
+                            .mapToInt(sale -> 1)
+                            .sum();
+
+                    return SellerRankingResponseDTO.builder()
+                            .sellerId(seller.getId())
+                            .sellerName(seller.getName())
+                            .totalSales(totalSales)
+                            .build();
+                })
+                .sorted((s1, s2) -> Integer.compare(s2.getTotalSales(), s1.getTotalSales()))
                 .collect(Collectors.toList());
     }
 }
