@@ -1,20 +1,16 @@
 package com.devilish.granja.dto.response;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class SellerResponseDTO {
-
-    private Long id;
-    private String cpf;
-    private String name;
-    private String registration;
-
+public class SellerRankingResponseDTO {
+    private Long sellerId;
+    private String sellerName;
+    private int totalSales;
 }

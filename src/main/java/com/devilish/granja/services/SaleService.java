@@ -2,6 +2,7 @@ package com.devilish.granja.services;
 
 import com.devilish.granja.dto.request.SaleRequestDTO;
 import com.devilish.granja.dto.response.SaleResponseDTO;
+import com.devilish.granja.dto.response.SoldDuckResponseDTO;
 
 import java.util.List;
 
@@ -11,4 +12,6 @@ public interface SaleService {
     List<SaleResponseDTO> findAll();
     SaleResponseDTO update(Long id, SaleRequestDTO saleRequestDTO);
     void delete(Long id); // Delete
+
+    List<SoldDuckResponseDTO> findAllSoldDucks();
 }
