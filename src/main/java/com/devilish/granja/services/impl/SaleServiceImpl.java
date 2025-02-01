@@ -8,9 +8,17 @@ import com.devilish.granja.repository.*;
 import com.devilish.granja.services.SaleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -226,5 +234,45 @@ public class SaleServiceImpl implements SaleService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public byte[] generateSalesReport() throws IOException {
+        List<Sale> sales = saleRepository.findAll();
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Relatório de Vendas");
+
+
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {"Nome", "Status", "Cliente", "Tipo do Cliente", "Valor", "Data/Hora", "Vendedor"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+        }
+
+
+        int rowNum = 1;
+        for (Sale sale : sales) {
+            Row row = sheet.createRow(rowNum++);
+
+            row.createCell(0).setCellValue(sale.getDucks().get(0).getName());
+            row.createCell(1).setCellValue(sale.getDucks().get(0).isSold() ? "Vendido" : "Disponível");
+            row.createCell(2).setCellValue(sale.getClient().getName());
+            row.createCell(3).setCellValue(sale.getClient().isDiscountEligible() ? "Com Desconto" : "Sem Desconto");
+            row.createCell(4).setCellValue(sale.getTotalValue());
+            row.createCell(5).setCellValue(sale.getDateSale().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+            row.createCell(6).setCellValue(sale.getSeller().getName());
+        }
+
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+
+        return outputStream.toByteArray();
     }
 }
