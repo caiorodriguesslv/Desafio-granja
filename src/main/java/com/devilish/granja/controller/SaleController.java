@@ -4,10 +4,16 @@ import com.devilish.granja.dto.request.SaleRequestDTO;
 import com.devilish.granja.dto.response.SaleResponseDTO;
 import com.devilish.granja.dto.response.SoldDuckResponseDTO;
 import com.devilish.granja.services.SaleService;
+import com.devilish.granja.services.impl.SaleServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -54,4 +60,17 @@ public class SaleController {
         saleService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/report")
+    public ResponseEntity<ByteArrayResource> downloadSalesReport() throws IOException {
+        byte[] reportBytes = saleService.generateSalesReport();
+
+        ByteArrayResource resource = new ByteArrayResource(reportBytes);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sales_report.xlsx")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(resource);
+    }
+
 }

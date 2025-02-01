@@ -28,7 +28,7 @@ public class DuckServiceImpl implements DuckService {
             throw new RuntimeException("Verifique os dados fornecidos.");
         }
 
-        if (duckRequestDTO.getMaeId() == null) {
+        if (duckRequestDTO.getMotherId() == null) {
             throw new RuntimeException("Verifique os dados fornecidos.");
         }
 
@@ -36,11 +36,11 @@ public class DuckServiceImpl implements DuckService {
             throw new RuntimeException("Verifique os dados fornecidos.");
         }
 
-        log.info("Salvando pato com mãe de ID: {}", duckRequestDTO.getMaeId());
+        log.info("Salvando pato com mãe de ID: {}", duckRequestDTO.getMotherId());
 
         Duck duck = Duck.builder()
                 .name(duckRequestDTO.getName())
-                .mae(Duck.builder().id(duckRequestDTO.getMaeId()).build())
+                .duckMother(Duck.builder().id(duckRequestDTO.getMotherId()).build())
                 .price(duckRequestDTO.getPrice())
                 .sold(duckRequestDTO.isSold())
                 .build();
@@ -52,7 +52,7 @@ public class DuckServiceImpl implements DuckService {
         return DuckResponseDTO.builder()
                 .id(savedDuck.getId())
                 .name(savedDuck.getName())
-                .maeId(savedDuck.getMae() != null ? savedDuck.getMae().getId() : null)
+                .motherId(savedDuck.getDuckMother() != null ? savedDuck.getDuckMother().getId() : null)
                 .price(savedDuck.getPrice())
                 .sold(savedDuck.isSold())
                 .build();
@@ -68,7 +68,7 @@ public class DuckServiceImpl implements DuckService {
         return DuckResponseDTO.builder()
                 .id(duck.getId())
                 .name(duck.getName())
-                .maeId(duck.getMae() != null ? duck.getMae().getId() : null)
+                .motherId(duck.getDuckMother() != null ? duck.getDuckMother().getId() : null)
                 .price(duck.getPrice())
                 .sold(duck.isSold())
                 .build();
@@ -84,7 +84,7 @@ public class DuckServiceImpl implements DuckService {
                 .map(duck -> DuckResponseDTO.builder()
                         .id(duck.getId())
                         .name(duck.getName())
-                        .maeId(duck.getMae() != null ? duck.getMae().getId() : null)
+                        .motherId(duck.getDuckMother() != null ? duck.getDuckMother().getId() : null)
                         .price(duck.getPrice())
                         .sold(duck.isSold())
                         .build())
@@ -98,7 +98,7 @@ public class DuckServiceImpl implements DuckService {
         Duck duck = duckRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Operação não permitida."));
 
-        if (duckRequestDTO.getMaeId() == null) {
+        if (duckRequestDTO.getMotherId() == null) {
             throw new InvalidMaeException("Verifique os dados fornecidos.");
         }
 
@@ -106,11 +106,11 @@ public class DuckServiceImpl implements DuckService {
             throw new RuntimeException("Verifique os dados fornecidos.");
         }
 
-        Duck mae = duckRepository.findById(duckRequestDTO.getMaeId())
+        Duck mae = duckRepository.findById(duckRequestDTO.getMotherId())
                 .orElseThrow(() -> new InvalidMaeException("Operação não permitida."));
 
         duck.setName(duckRequestDTO.getName());
-        duck.setMae(mae);
+        duck.setDuckMother(mae);
         duck.setPrice(duckRequestDTO.getPrice());
         duck.setSold(duckRequestDTO.isSold());
 
@@ -121,7 +121,7 @@ public class DuckServiceImpl implements DuckService {
         return DuckResponseDTO.builder()
                 .id(updatedDuck.getId())
                 .name(updatedDuck.getName())
-                .maeId(updatedDuck.getMae() != null ? updatedDuck.getMae().getId() : null)
+                .motherId(updatedDuck.getDuckMother() != null ? updatedDuck.getDuckMother().getId() : null)
                 .price(updatedDuck.getPrice())
                 .sold(updatedDuck.isSold())
                 .build();
