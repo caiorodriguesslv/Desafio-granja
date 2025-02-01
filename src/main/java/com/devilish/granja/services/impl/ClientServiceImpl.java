@@ -3,6 +3,8 @@ package com.devilish.granja.services.impl;
 import com.devilish.granja.dto.request.ClientRequestDTO;
 import com.devilish.granja.dto.response.ClientResponseDTO;
 import com.devilish.granja.entities.Client;
+import com.devilish.granja.exceptions.InvalidDataException;
+import com.devilish.granja.exceptions.ResourceNotFoundException;
 import com.devilish.granja.repository.ClientRepository;
 import com.devilish.granja.services.ClientService;
 import lombok.RequiredArgsConstructor;
@@ -23,18 +25,15 @@ public class ClientServiceImpl implements ClientService {
     public ClientResponseDTO save(ClientRequestDTO clientRequestDTO) {
         log.info("Iniciando método save para o cliente: {}", clientRequestDTO.getName());
 
-
         if (clientRequestDTO.getName() == null || clientRequestDTO.getName().trim().isEmpty()) {
             log.error("Nome do cliente não pode ser vazio.");
-            throw new RuntimeException("Dados inválidos. Verifique as informações fornecidas.");
+            throw new InvalidDataException("O nome do cliente é obrigatório.");
         }
-
 
         Client client = Client.builder()
                 .name(clientRequestDTO.getName())
                 .discountEligible(clientRequestDTO.isDiscountEligible())
                 .build();
-
 
         Client savedClient = clientRepository.save(client);
 
@@ -51,11 +50,10 @@ public class ClientServiceImpl implements ClientService {
     public ClientResponseDTO findById(Long id) {
         log.info("Buscando cliente com ID: {}", id);
 
-
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Cliente não encontrado com o ID: {}", id);
-                    return new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
+                    return new ResourceNotFoundException("Cliente não encontrado.");
                 });
 
         log.info("Cliente encontrado: ID={}, Nome={}", client.getId(), client.getName());
@@ -92,25 +90,21 @@ public class ClientServiceImpl implements ClientService {
     public ClientResponseDTO update(Long id, ClientRequestDTO clientRequestDTO) {
         log.info("Atualizando cliente com ID: {}", id);
 
-
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Cliente não encontrado com o ID: {}", id);
-                    return new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
+                    return new ResourceNotFoundException("Cliente não encontrado.");
                 });
 
         log.info("Cliente encontrado para atualização: ID={}, Nome={}", client.getId(), client.getName());
 
-
         if (clientRequestDTO.getName() == null || clientRequestDTO.getName().trim().isEmpty()) {
             log.error("Nome do cliente não pode ser vazio.");
-            throw new RuntimeException("Dados inválidos. Verifique as informações fornecidas.");
+            throw new InvalidDataException("O nome do cliente é obrigatório.");
         }
-
 
         client.setName(clientRequestDTO.getName());
         client.setDiscountEligible(clientRequestDTO.isDiscountEligible());
-
 
         Client updatedClient = clientRepository.save(client);
 
@@ -127,15 +121,13 @@ public class ClientServiceImpl implements ClientService {
     public void delete(Long id) {
         log.info("Excluindo cliente com ID: {}", id);
 
-
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Cliente não encontrado com o ID: {}", id);
-                    return new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
+                    return new ResourceNotFoundException("Cliente não encontrado.");
                 });
 
         log.info("Cliente encontrado para exclusão: ID={}, Nome={}", client.getId(), client.getName());
-
 
         clientRepository.delete(client);
 

@@ -5,6 +5,9 @@ import com.devilish.granja.dto.response.SellerRankingResponseDTO;
 import com.devilish.granja.dto.response.SellerResponseDTO;
 import com.devilish.granja.entities.Duck;
 import com.devilish.granja.entities.Seller;
+import com.devilish.granja.exceptions.InvalidDataException;
+import com.devilish.granja.exceptions.OperationNotAllowedException;
+import com.devilish.granja.exceptions.ResourceNotFoundException;
 import com.devilish.granja.repository.SaleRepository;
 import com.devilish.granja.repository.SellerRepository;
 import com.devilish.granja.services.SellerService;
@@ -29,31 +32,26 @@ public class SellerServiceImpl implements SellerService {
     public SellerResponseDTO save(SellerRequestDTO sellerRequestDTO) {
         log.info("Iniciando método save para o vendedor: {}", sellerRequestDTO.getName());
 
-
         if (!sellerRequestDTO.isValidCpfAndRegistration()) {
             log.error("Dados inválidos fornecidos para o vendedor: {}", sellerRequestDTO.getName());
-            throw new RuntimeException("Dados inválidos. Verifique as informações fornecidas.");
+            throw new InvalidDataException("CPF ou matrícula inválidos.");
         }
-
 
         sellerRepository.findByCpf(sellerRequestDTO.getCpf()).ifPresent(seller -> {
             log.error("Tentativa de cadastro com CPF já existente: {}", sellerRequestDTO.getCpf());
-            throw new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
+            throw new OperationNotAllowedException("CPF já cadastrado.");
         });
-
 
         sellerRepository.findByRegistration(sellerRequestDTO.getRegistration()).ifPresent(seller -> {
             log.error("Tentativa de cadastro com matrícula já existente: {}", sellerRequestDTO.getRegistration());
-            throw new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
+            throw new OperationNotAllowedException("Matrícula já cadastrada.");
         });
-
 
         Seller seller = Seller.builder()
                 .name(sellerRequestDTO.getName())
                 .cpf(sellerRequestDTO.getCpf())
                 .registration(sellerRequestDTO.getRegistration())
                 .build();
-
 
         Seller savedSeller = sellerRepository.save(seller);
 
@@ -71,48 +69,41 @@ public class SellerServiceImpl implements SellerService {
     public SellerResponseDTO update(Long id, SellerRequestDTO sellerRequestDTO) {
         log.info("Iniciando atualização do vendedor com ID: {}", id);
 
-
         Seller seller = sellerRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", id);
-                    return new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
+                    return new ResourceNotFoundException("Vendedor não encontrado.");
                 });
 
         log.info("Vendedor encontrado: ID={}, Nome={}", seller.getId(), seller.getName());
 
-
         if (!Validator.isValidCpf(sellerRequestDTO.getCpf())) {
             log.error("CPF inválido fornecido para atualização: {}", sellerRequestDTO.getCpf());
-            throw new RuntimeException("Dados inválidos. Verifique as informações fornecidas.");
+            throw new InvalidDataException("CPF inválido.");
         }
-
 
         if (!Validator.isValidRegistration(sellerRequestDTO.getRegistration())) {
             log.error("Matrícula inválida fornecida para atualização: {}", sellerRequestDTO.getRegistration());
-            throw new RuntimeException("Dados inválidos. Verifique as informações fornecidas.");
+            throw new InvalidDataException("Matrícula inválida.");
         }
-
 
         if (!seller.getCpf().equals(sellerRequestDTO.getCpf())) {
             sellerRepository.findByCpf(sellerRequestDTO.getCpf()).ifPresent(existingSeller -> {
                 log.error("Tentativa de atualização com CPF já existente: {}", sellerRequestDTO.getCpf());
-                throw new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
+                throw new OperationNotAllowedException("CPF já cadastrado.");
             });
         }
-
 
         if (!seller.getRegistration().equals(sellerRequestDTO.getRegistration())) {
             sellerRepository.findByRegistration(sellerRequestDTO.getRegistration()).ifPresent(existingSeller -> {
                 log.error("Tentativa de atualização com matrícula já existente: {}", sellerRequestDTO.getRegistration());
-                throw new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
+                throw new OperationNotAllowedException("Matrícula já cadastrada.");
             });
         }
-
 
         seller.setName(sellerRequestDTO.getName());
         seller.setCpf(sellerRequestDTO.getCpf());
         seller.setRegistration(sellerRequestDTO.getRegistration());
-
 
         Seller updatedSeller = sellerRepository.save(seller);
 
@@ -130,11 +121,10 @@ public class SellerServiceImpl implements SellerService {
     public SellerResponseDTO findById(Long id) {
         log.info("Buscando vendedor com ID: {}", id);
 
-
         Seller seller = sellerRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", id);
-                    return new RuntimeException("Operação não permitida. Verifique os dados fornecidos.");
+                    return new ResourceNotFoundException("Vendedor não encontrado.");
                 });
 
         log.info("Vendedor encontrado: ID={}, Nome={}", seller.getId(), seller.getName());
@@ -150,7 +140,6 @@ public class SellerServiceImpl implements SellerService {
     @Override
     public List<SellerResponseDTO> findAll() {
         log.info("Listando todos os vendedores");
-
 
         List<Seller> sellers = sellerRepository.findAll();
 
