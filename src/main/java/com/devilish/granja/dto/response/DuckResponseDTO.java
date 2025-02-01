@@ -13,7 +13,7 @@ public class DuckResponseDTO {
 
     private Long id;
     private String name;
-    private Long maeId;
+    private Long motherId;
     private boolean sold;
     private double price;
 }

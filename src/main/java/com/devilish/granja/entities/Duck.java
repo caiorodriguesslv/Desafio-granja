@@ -18,8 +18,8 @@ public class Duck {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "mae_id")
-    private Duck mae;
+    @JoinColumn(name = "mother_id")
+    private Duck duckMother;
 
     private boolean sold;
 

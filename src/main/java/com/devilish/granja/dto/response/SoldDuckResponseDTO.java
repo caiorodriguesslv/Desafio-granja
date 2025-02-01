@@ -21,6 +21,7 @@ public class SoldDuckResponseDTO {
     public static class DuckInfoDTO {
         private String name;
         private double price;
+        private String duckMother;
     }
 
     @Data
