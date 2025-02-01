@@ -3,7 +3,10 @@ package com.devilish.granja.services.impl;
 import com.devilish.granja.dto.request.DuckRequestDTO;
 import com.devilish.granja.dto.response.DuckResponseDTO;
 import com.devilish.granja.entities.Duck;
-import com.devilish.granja.exceptions.InvalidMaeException;
+import com.devilish.granja.exceptions.InvalidDataException;
+import com.devilish.granja.exceptions.InvalidMotherException;
+import com.devilish.granja.exceptions.InvalidPriceException;
+import com.devilish.granja.exceptions.OperationNotAllowedException;
 import com.devilish.granja.repository.DuckRepository;
 import com.devilish.granja.services.DuckService;
 import lombok.RequiredArgsConstructor;
@@ -25,15 +28,15 @@ public class DuckServiceImpl implements DuckService {
         log.info("Iniciando método save");
 
         if (duckRequestDTO.getName() == null || duckRequestDTO.getName().trim().isEmpty()) {
-            throw new RuntimeException("Verifique os dados fornecidos.");
+            throw new InvalidDataException("Dados inválidos fornecidos.");
         }
 
         if (duckRequestDTO.getMotherId() == null) {
-            throw new RuntimeException("Verifique os dados fornecidos.");
+            throw new InvalidDataException("Dados inválidos fornecidos.");
         }
 
         if (duckRequestDTO.getPrice() <= 0) {
-            throw new RuntimeException("Verifique os dados fornecidos.");
+            throw new InvalidPriceException("O preço fornecido é inválido.");
         }
 
         log.info("Salvando pato com mãe de ID: {}", duckRequestDTO.getMotherId());
@@ -63,7 +66,10 @@ public class DuckServiceImpl implements DuckService {
         log.info("Buscando pato com ID: {}", id);
 
         Duck duck = duckRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Operação não permitida."));
+                .orElseThrow(() -> {
+                    log.error("Pato não encontrado com o ID: {}", id);
+                    return new OperationNotAllowedException("Recurso não encontrado.");
+                });
 
         return DuckResponseDTO.builder()
                 .id(duck.getId())
@@ -99,7 +105,7 @@ public class DuckServiceImpl implements DuckService {
                 .orElseThrow(() -> new RuntimeException("Operação não permitida."));
 
         if (duckRequestDTO.getMotherId() == null) {
-            throw new InvalidMaeException("Verifique os dados fornecidos.");
+            throw new InvalidMotherException("Verifique os dados fornecidos.");
         }
 
         if (duckRequestDTO.getPrice() <= 0) {
@@ -107,7 +113,7 @@ public class DuckServiceImpl implements DuckService {
         }
 
         Duck mae = duckRepository.findById(duckRequestDTO.getMotherId())
-                .orElseThrow(() -> new InvalidMaeException("Operação não permitida."));
+                .orElseThrow(() -> new InvalidMotherException("Operação não permitida."));
 
         duck.setName(duckRequestDTO.getName());
         duck.setDuckMother(mae);
@@ -132,7 +138,7 @@ public class DuckServiceImpl implements DuckService {
         log.info("Excluindo pato com ID: {}", id);
 
         Duck duck = duckRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Operação não permitida."));
+                .orElseThrow(() -> new OperationNotAllowedException("Pato não encontrado"));
 
         duckRepository.delete(duck);
 

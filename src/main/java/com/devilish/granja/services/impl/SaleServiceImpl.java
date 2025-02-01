@@ -4,6 +4,9 @@ import com.devilish.granja.dto.request.SaleRequestDTO;
 import com.devilish.granja.dto.response.SaleResponseDTO;
 import com.devilish.granja.dto.response.SoldDuckResponseDTO;
 import com.devilish.granja.entities.*;
+import com.devilish.granja.exceptions.InvalidDataException;
+import com.devilish.granja.exceptions.OperationNotAllowedException;
+import com.devilish.granja.exceptions.ResourceNotFoundException;
 import com.devilish.granja.repository.*;
 import com.devilish.granja.services.SaleService;
 import lombok.RequiredArgsConstructor;
@@ -37,25 +40,25 @@ public class SaleServiceImpl implements SaleService {
         Client client = clientRepository.findById(saleRequestDTO.getClientId())
                 .orElseThrow(() -> {
                     log.error("Cliente não encontrado com o ID: {}", saleRequestDTO.getClientId());
-                    return new RuntimeException("Operação não permitida.");
+                    return new ResourceNotFoundException("Cliente não encontrado.");
                 });
 
         Seller seller = sellerRepository.findById(saleRequestDTO.getSellerId())
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", saleRequestDTO.getSellerId());
-                    return new RuntimeException("Operação não permitida.");
+                    return new ResourceNotFoundException("Vendedor não encontrado.");
                 });
 
         List<Duck> ducks = duckRepository.findAllById(saleRequestDTO.getDuckIds());
         if (ducks.isEmpty()) {
             log.error("Nenhum pato encontrado com os IDs fornecidos: {}", saleRequestDTO.getDuckIds());
-            throw new RuntimeException("Verifique os dados fornecidos.");
+            throw new InvalidDataException("Nenhum pato válido fornecido.");
         }
 
         ducks.forEach(duck -> {
             if (duck.isSold()) {
                 log.error("Pato já vendido: ID={}, Nome={}", duck.getId(), duck.getName());
-                throw new RuntimeException("Operação não permitida.");
+                throw new OperationNotAllowedException("Pato já vendido.");
             }
         });
 
@@ -91,7 +94,7 @@ public class SaleServiceImpl implements SaleService {
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Venda não encontrada com o ID: {}", id);
-                    return new RuntimeException("Operação não permitida.");
+                    return new ResourceNotFoundException("Venda não encontrada.");
                 });
 
         log.info("Venda encontrada: ID={}, Data={}, Cliente ID={}, Vendedor ID={}, Valor Total={}",
@@ -120,7 +123,7 @@ public class SaleServiceImpl implements SaleService {
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Venda não encontrada com o ID: {}", id);
-                    return new RuntimeException("Operação não permitida.");
+                    return new ResourceNotFoundException("Venda não encontrada.");
                 });
 
         log.info("Venda encontrada para atualização: ID={}, Data={}, Cliente ID={}, Vendedor ID={}, Valor Total={}",
@@ -129,25 +132,25 @@ public class SaleServiceImpl implements SaleService {
         Client client = clientRepository.findById(saleRequestDTO.getClientId())
                 .orElseThrow(() -> {
                     log.error("Cliente não encontrado com o ID: {}", saleRequestDTO.getClientId());
-                    return new RuntimeException("Operação não permitida.");
+                    return new ResourceNotFoundException("Cliente não encontrado.");
                 });
 
         Seller seller = sellerRepository.findById(saleRequestDTO.getSellerId())
                 .orElseThrow(() -> {
                     log.error("Vendedor não encontrado com o ID: {}", saleRequestDTO.getSellerId());
-                    return new RuntimeException("Operação não permitida.");
+                    return new ResourceNotFoundException("Vendedor não encontrado.");
                 });
 
         List<Duck> ducks = duckRepository.findAllById(saleRequestDTO.getDuckIds());
         if (ducks.isEmpty()) {
             log.error("Nenhum pato encontrado com os IDs fornecidos: {}", saleRequestDTO.getDuckIds());
-            throw new RuntimeException("Verifique os dados fornecidos.");
+            throw new InvalidDataException("Nenhum pato válido fornecido.");
         }
 
         ducks.forEach(duck -> {
             if (duck.isSold() && !sale.getDucks().contains(duck)) {
                 log.error("Pato já vendido em outra venda: ID={}, Nome={}", duck.getId(), duck.getName());
-                throw new RuntimeException("Operação não permitida.");
+                throw new OperationNotAllowedException("Pato já vendido.");
             }
         });
 
@@ -181,7 +184,7 @@ public class SaleServiceImpl implements SaleService {
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Venda não encontrada com o ID: {}", id);
-                    return new RuntimeException("Operação não permitida.");
+                    return new ResourceNotFoundException("Venda não encontrada.");
                 });
 
         log.info("Venda encontrada para exclusão: ID={}, Data={}, Cliente ID={}, Vendedor ID={}, Valor Total={}",
