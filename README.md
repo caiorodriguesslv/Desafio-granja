@@ -20,7 +20,7 @@ The goal is to create a comprehensive management system for the farm.
 * Docker (for containerization)
 * Docker Compose (for managing multi-container setups)
 * PostgreSQL (relational database)
-* [Postman](undefined/workspace/desafio-granja/collection/21958705-df219aa6-31a8-44f4-900f-14dc1012085b?action=share&creator=21958705) (for API testing and requests)
+* [Postman](https://www.postman.com/interstellar-moon-715825/workspace/desafio-granja/collection/21958705-df219aa6-31a8-44f4-900f-14dc1012085b?action=share&creator=21958705) (for API testing and requests)
   
 
 ## ⚙️ Running the Project
