@@ -56,18 +56,4 @@ The goal is to create a comprehensive management system for the farm.
       
   5. http://localhost:8080/v1/sales/report in browser for downloading Excel.
 
-## 🛠️ Additional Information: 
 
-<p align="center">1º Planning </p>
-
-<div align="center"> 
-    <img src="https://private-user-images.githubusercontent.com/101218403/408779041-cae31800-1720-449a-9b0d-21a6b885b0d0.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzgzOTAwNzIsIm5iZiI6MTczODM4OTc3MiwicGF0aCI6Ii8xMDEyMTg0MDMvNDA4Nzc5MDQxLWNhZTMxODAwLTE3MjAtNDQ5YS05YjBkLTIxYTZiODg1YjBkMC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwMjAxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDIwMVQwNjAyNTJaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT04Nzc4NjUyNWI4YTU3ZTg4OTdlNGVkYzA4YTNiZmIwZGE3OGMyOTQyMDhkMTA1NDhhYTdlYWMwODE4OTE3NGU3JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.3Aw55UI56kxTzFjNZOthx8ax7WOmnSjVpJWOv5Dif0g"/> 
-</div>
-
-
-
-<p align="center">2º Diagram DER </p>
-
-<div align="center"> 
-    <img src="https://private-user-images.githubusercontent.com/101218403/408777959-af308782-593c-4d96-8d8c-e0d0c2ab22d6.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzgzODg3NzEsIm5iZiI6MTczODM4ODQ3MSwicGF0aCI6Ii8xMDEyMTg0MDMvNDA4Nzc3OTU5LWFmMzA4NzgyLTU5M2MtNGQ5Ni04ZDhjLWUwZDBjMmFiMjJkNi5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwMjAxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDIwMVQwNTQxMTFaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT05ZDVlMzUyN2FkM2UwMGUxZDhkNTc3YTAyNGUzYTYwODQ1MTNiZjNiY2U2YTJkMTE0YTk0ZDUwZjIxZmZmZDEyJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.O7YYT-WHIDpuT8oKstdYViaFoncCc8zjYqekLQNCgAQ"/> 
-</div>
